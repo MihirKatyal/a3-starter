@@ -16,5 +16,7 @@ def send(server:str, port:int, username:str, password:str, message:str, bio:str=
   '''
   try:
     # Establish socket connection
-    with
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+      client.connect((server, port))
+      print(f'Connected to {server} on port {port}')
 
