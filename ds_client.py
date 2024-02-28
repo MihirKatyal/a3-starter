@@ -1,7 +1,6 @@
 import socket
 import ds_protocol
 import sys
-import json  
 
 def send(server: str, port: int, username: str, password: str, message: str, bio: str = None):
     try:
@@ -21,36 +20,45 @@ def send(server: str, port: int, username: str, password: str, message: str, bio
 
             # Receive and process server response for join request
             res = recv.readline()
-            srv_msg = ds_protocol.extract_msg(res)  
-            if srv_msg['type'] == 'ok':
-                tkn = srv_msg['token']  
+            srv_msg = ds_protocol.extract_msg(res)  # This should return a namedtuple
+            if srv_msg.type == 'ok':  # Corrected access for namedtuple
+                tkn = srv_msg.token
+                
+                # Initialize a result dictionary
+                results = {'join': 'Success', 'post': None, 'bio': None}
                 
                 # Send post message if provided
                 if message:
-                    POST = ds_protocol.post(tkn, message)  
+                    POST = ds_protocol.post(tkn, message)
                     Send.write(POST + '\r\n')
                     Send.flush()
-                    res = recv.readline()  
-                    
+                    res = recv.readline()
+                    post_response = ds_protocol.extract_msg(res)  # Again expecting a namedtuple
+                    results['post'] = 'Success' if post_response.type == 'ok' else 'Failed'
+
                 # Send bio if provided
                 if bio:
-                    BIO = ds_protocol.bio(tkn, bio)  
+                    BIO = ds_protocol.bio(tkn, bio)
                     Send.write(BIO + '\r\n')
                     Send.flush()
-                    res = recv.readline()  
+                    res = recv.readline()
+                    bio_response = ds_protocol.extract_msg(res)  # And again for bio response
+                    results['bio'] = 'Success' if bio_response.type == 'ok' else 'Failed'
                 
-                print("Post successfully published!")
+                return results  # Returning the results dictionary
             else:
-                print(f"Error joining server: {srv_msg.get('message', 'Unknown error')}")
+                print(f"Error joining server: {srv_msg.message}")
+                return {'join': 'Failed'}
     except Exception as e:
-        print(f"ERROR connecting to the server: {e}", sys.exc_info()[0])
+        print(f"ERROR connecting to the server: {e}", sys.exc_info())
+        return {'error': str(e)}
 
 # This is the testing block
 if __name__ == '__main__':
     SERVER_ADDRESS = '168.235.86.101'
     SERVER_PORT = 3021
-    test_username = 'your_test_username'
-    test_password = 'your_test_password'
+    test_username = 'your_test_username'  # Replace with actual test credentials
+    test_password = 'your_test_password'  # Replace with actual test credentials
     test_message = 'Hello, DSP!'
     test_bio = 'This is a test bio.'
 
