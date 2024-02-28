@@ -1,7 +1,7 @@
 import socket
 import ds_protocol
 import sys
-import json  # Make sure to import json if it's used in your ds_protocol module
+import json  
 
 def send(server: str, port: int, username: str, password: str, message: str, bio: str = None):
     try:
@@ -21,23 +21,23 @@ def send(server: str, port: int, username: str, password: str, message: str, bio
 
             # Receive and process server response for join request
             res = recv.readline()
-            srv_msg = ds_protocol.extract_msg(res)  # Make sure this function exists and properly extracts server messages
+            srv_msg = ds_protocol.extract_msg(res)  
             if srv_msg['type'] == 'ok':
-                tkn = srv_msg['token']  # Adjust these fields based on actual server response structure
+                tkn = srv_msg['token']  
                 
                 # Send post message if provided
                 if message:
-                    POST = ds_protocol.post(tkn, message)  # Adjust parameters according to your protocol
+                    POST = ds_protocol.post(tkn, message)  
                     Send.write(POST + '\r\n')
                     Send.flush()
-                    res = recv.readline()  # Consider processing this response as well
+                    res = recv.readline()  
                     
                 # Send bio if provided
                 if bio:
-                    BIO = ds_protocol.bio(tkn, bio)  # Adjust parameters according to your protocol
+                    BIO = ds_protocol.bio(tkn, bio)  
                     Send.write(BIO + '\r\n')
                     Send.flush()
-                    res = recv.readline()  # Consider processing this response as well
+                    res = recv.readline()  
                 
                 print("Post successfully published!")
             else:
