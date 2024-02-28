@@ -16,7 +16,7 @@ def join(username, password): # Create a join request in JSON formt
 def post(token, message): # Create a post request in JSON format
   return json.dumps({
     "token": token,
-    post: {
+    "post": {
       "entry": message,
       "timestamp": "" 
     }
