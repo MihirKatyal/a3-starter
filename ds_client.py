@@ -24,4 +24,9 @@ def send(server:str, port:int, username:str, password:str, message:str, bio:str=
       Send = client.makefile('w')
       recv = client.makefile('r')
 
+      # Send join request to the server
+      Join = ds_protocol.join(username, password)
+      Send.write(Join + '\r\n')
+      Send.flush()
+
 
