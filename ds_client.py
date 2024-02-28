@@ -1,10 +1,7 @@
-# Starter code for assignment 3 in ICS 32 Programming with Software Libraries in Python
-
-# Replace the following placeholders with your information.
-
-# NAME
-# EMAIL
-# STUDENT ID
+import socket
+import ds_protocol
+import sys
+import json
 
 def send(server:str, port:int, username:str, password:str, message:str, bio:str=None):
   '''
@@ -17,5 +14,7 @@ def send(server:str, port:int, username:str, password:str, message:str, bio:str=
   :param message: The message to be sent to the server.
   :param bio: Optional, a bio for the user.
   '''
-  #TODO: return either True or False depending on results of required operation
-  return 
+  try:
+    # Establish socket connection
+    with
+
