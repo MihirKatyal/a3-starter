@@ -41,4 +41,20 @@ def extract_json(json_msg:str) -> DataTuple: #Call the json.loads function on a 
     print("Json cannot be decoded.")
     return DataTuple('json_error', 'Json cannot be decoded', None)
 
-  return DataTuple(foo, baz)
+  return DataTuple(response_type, message, token)
+
+def extract_msg(json_msg: str) -> ErrorTuple:
+    try:
+        json_obj = json.loads(json_msg)
+        # Assuming 'response' is a key in the JSON object for normal responses
+        if 'response' in json_obj:
+            response_type = json_obj['response'].get('type', 'unknown')
+            message = json_obj['response'].get('message', '')
+            token = json_obj['response'].get('token', None)
+            return DataTuple(response_type, message, token)
+        else:
+            # Use ErrorTuple if the response does not follow the expected structure
+            return ErrorTuple('error', 'Unexpected response format', None)
+    except json.JSONDecodeError:
+        print("JSON cannot be decoded.")
+        return ErrorTuple('error', 'Invalid JSON format', None)
