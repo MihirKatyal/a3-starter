@@ -21,7 +21,7 @@ def send(server: str, port: int, username: str, password: str, message: str, bio
             # Receive and process server response for join request
             res = recv.readline()
             srv_msg = ds_protocol.extract_msg(res)  # This should return a namedtuple
-            if srv_msg.type == 'ok':  # Corrected access for namedtuple
+            if srv_msg.type == 'ok':  
                 tkn = srv_msg.token
                 
                 # Initialize a result dictionary
@@ -33,7 +33,7 @@ def send(server: str, port: int, username: str, password: str, message: str, bio
                     Send.write(POST + '\r\n')
                     Send.flush()
                     res = recv.readline()
-                    post_response = ds_protocol.extract_msg(res)  # Again expecting a namedtuple
+                    post_response = ds_protocol.extract_msg(res)  #  expecting a namedtuple
                     results['post'] = 'Success' if post_response.type == 'ok' else 'Failed'
 
                 # Send bio if provided
@@ -42,7 +42,7 @@ def send(server: str, port: int, username: str, password: str, message: str, bio
                     Send.write(BIO + '\r\n')
                     Send.flush()
                     res = recv.readline()
-                    bio_response = ds_protocol.extract_msg(res)  # And again for bio response
+                    bio_response = ds_protocol.extract_msg(res)  #  again for bio response
                     results['bio'] = 'Success' if bio_response.type == 'ok' else 'Failed'
                 
                 return results  # Returning the results dictionary
@@ -57,8 +57,8 @@ def send(server: str, port: int, username: str, password: str, message: str, bio
 if __name__ == '__main__':
     SERVER_ADDRESS = '168.235.86.101'
     SERVER_PORT = 3021
-    test_username = 'your_test_username'  # Replace with actual test credentials
-    test_password = 'your_test_password'  # Replace with actual test credentials
+    test_username = 'f21demo' 
+    test_password = 'pwd123'  
     test_message = 'Hello, DSP!'
     test_bio = 'This is a test bio.'
 
