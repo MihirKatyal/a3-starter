@@ -7,10 +7,7 @@ DataTuple = namedtuple('DataTuple', ['foo','baz'])
 
 ErrorTuple = namedtuple('ErrorTuple', ['type', 'message', 'token'])
 
-def join(username, password):
-  '''
-  Create a join request in JSON format
-  '''
+def join(username, password): # Create a join request in JSON formt
   return json.dumps({
     "join": {
       "username": username,
@@ -19,12 +16,14 @@ def join(username, password):
     }
   })
 
-
-
-
-
-
-
+def post(token, message): # Create a post request in JSON format
+  return json.dumps({
+    "token": token,
+    post: {
+      "entry": message,
+      "timestamp": "" 
+    }
+  })
 
 
 def extract_json(json_msg:str) -> DataTuple:
