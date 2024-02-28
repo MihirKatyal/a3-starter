@@ -29,4 +29,9 @@ def send(server:str, port:int, username:str, password:str, message:str, bio:str=
       Send.write(Join + '\r\n')
       Send.flush()
 
+    # Receive and process server response for join request
+    res = recv.readline()
+    srv_msg = ds_protocol.extract_msg(res)  # Make sure this function exists and properly extracts server messages
+    if srv_msg['type'] == 'ok':
+      tkn = srv_msg['token']  # Adjust these fields based on actual server response structure
 
