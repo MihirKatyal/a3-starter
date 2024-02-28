@@ -19,4 +19,9 @@ def send(server:str, port:int, username:str, password:str, message:str, bio:str=
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
       client.connect((server, port))
       print(f'Connected to {server} on port {port}')
+            
+      # Set up file-like communication channels
+      Send = client.makefile('w')
+      recv = client.makefile('r')
+
 
