@@ -25,6 +25,21 @@ def post(token, message): # Create a post request in JSON format
     }
   })
 
+def bio(token, bio): # Create a bio request in JSON format
+  return json.dumps({
+    "token": token,
+    "bio": {
+      "entry": bio,
+      "timestamp": ""
+    }
+  })
+
+def extract_json(json_msg: str):
+    try:
+        return json.loads(json_msg)
+    except json.JSONDecodeError:
+        print("JSON cannot be decoded.")
+        return None
 
 def extract_json(json_msg:str) -> DataTuple:
   '''
