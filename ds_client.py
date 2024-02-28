@@ -35,3 +35,11 @@ def send(server:str, port:int, username:str, password:str, message:str, bio:str=
     if srv_msg['type'] == 'ok':
       tkn = srv_msg['token']  # Adjust these fields based on actual server response structure
 
+    #Send post message
+      if message:
+        POST= ds_protocol.post(tkn, message,)
+        Send.write(POST + '\r\n')
+        Send.flush()
+        res = recv.readline()
+
+    #Send bio
