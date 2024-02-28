@@ -29,22 +29,28 @@ def send(server:str, port:int, username:str, password:str, message:str, bio:str=
       Send.write(Join + '\r\n')
       Send.flush()
 
-    # Receive and process server response for join request
-    res = recv.readline()
-    srv_msg = ds_protocol.extract_msg(res)  # Make sure this function exists and properly extracts server messages
+      # Receive and process server response for join request
+      res = recv.readline()
+      srv_msg = ds_protocol.extract_msg(res)  # Make sure this function exists and properly extracts server messages
     if srv_msg['type'] == 'ok':
       tkn = srv_msg['token']  # Adjust these fields based on actual server response structure
 
-    #Send post message
+      #Send post message
       if message:
         POST= ds_protocol.post(tkn, message,)
         Send.write(POST + '\r\n')
         Send.flush()
         res = recv.readline()
 
-    #Send bio
-        if bio:
-          BIO= ds_protocol.bio(tkn, bio)
-          Send.write(BIO + '\r\n')
-          Send.flush()
-          res = recv.readline()
+        #Send bio
+      if bio:
+        BIO= ds_protocol.bio(tkn, bio)
+        Send.write(BIO + '\r\n')
+        Send.flush()
+        res = recv.readline()
+
+    print("Post successfully published")
+    else:
+      print(f"Error joinig server: {srv_msg.get('message', 'Unknown error')}")
+  except Exception as e:
+    print(f"Error connecting to the server: {e}", sys.exc_info()[0])
