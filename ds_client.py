@@ -43,3 +43,8 @@ def send(server:str, port:int, username:str, password:str, message:str, bio:str=
         res = recv.readline()
 
     #Send bio
+        if bio:
+          BIO= ds_protocol.bio(tkn, bio)
+          Send.write(BIO + '\r\n')
+          Send.flush()
+          res = recv.readline()
