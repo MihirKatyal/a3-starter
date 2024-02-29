@@ -1,9 +1,16 @@
+import ds_client
+import Profile
+
 def user_interface():
     print("Welcome! Please choose an option:")
     print("c - Create a new DSU file")
     print("l - Load an existing DSU file")
-    print("admin - Enter Admin mode for advanced commands")
-    choice = input("Your choice (c/l/admin): ").strip().lower()
+    print("p - Post a journal entry online")
+    print("u - Update bio online")
+    print("v - View current profile info")
+    print("q - Quit")
+    choice = input("Your choice (c/l/p/u/v/q): ").strip().lower()
+
 
     return choice
 
