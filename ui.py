@@ -2,7 +2,7 @@ import ds_client
 import Profile
 
 def user_interface():
-    profile = None  # This will hold the user's profile information
+    profile = None  # meant to hold the user's profile information
     while True:
         print("Welcome! Please choose an option:")
         print("c - Create a new DSU file")
@@ -36,7 +36,6 @@ def create_profile():
     username = input("Enter username: ").strip()
     password = input("Enter password: ").strip()
     new_profile = Profile.Profile(dsuserver, username, password)
-    # Here you might add additional attributes to your Profile instance
     return new_profile
 
 def load_profile():
@@ -80,8 +79,64 @@ def view_profile_info(profile):
     for post in profile.get_posts():
         print(f"- {post.entry}")
 
-def admin_mode():
-    print("Welcome to Admin mode! Please choose an option:")
+def admin_mode(profile):
+    while True:
+        print("\nWelcome to Admin mode! Please choose an option:")
+        print("1 - View all local posts")
+        print("2 - Change DS server IP")
+        print("3 - View current DS server settings")
+        print("4 - Test server connection")
+        print("0 - Exit Admin mode")
+        choice = input("Your choice: ").strip()
+
+        if choice == '1':
+            view_all_posts(profile)
+        elif choice == '2':
+            change_ds_server_ip(profile)
+        elif choice == '3':
+            view_current_server_settings(profile)
+        elif choice == '4':
+            test_server_connection(profile)
+        elif choice == '0':
+            break
+        else:
+            print("Invalid option. Please try again.")
+
+def view_all_posts(profile):
+    if profile and profile.get_posts():
+        print("\nAll Local Posts:")
+        for i, post in enumerate(profile.get_posts()):
+            print(f"{i}: {post.entry} - Timestamp: {post.timestamp}")
+    else:
+        print("No posts available or no profile loaded.")
+
+def change_ds_server_ip(profile):
+    if profile:
+        new_ip = input("Enter new DS server IP: ").strip()
+        profile.dsuserver = new_ip
+        print(f"DS server IP changed to {new_ip}.")
+    else:
+        print("No profile loaded.")
+
+def view_current_server_settings(profile):
+    if profile:
+        print(f"\nCurrent DS server IP: {profile.dsuserver}")
+    else:
+        print("No profile loaded.")
+
+def test_server_connection(profile):
+    if profile:
+        print("Testing connection to the server...")
+        try:
+            response = ds_client.send(profile.dsuserver, 3021, profile.username, profile.password, message="Test connection")
+            if response:
+                print("Connection to the server was successful.")
+            else:
+                print("Failed to connect to the server.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+    else:
+        print("No profile loaded.")
 
 if __name__ == "__main__":
     user_interface()
