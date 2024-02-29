@@ -21,7 +21,7 @@ def post(token, message):
         "token": token,
         "post": {
             "entry": message,
-            "timestamp": ""  # Server might fill in the timestamp; verify with your server's API
+            "timestamp": ""  
         }
     })
 
@@ -31,7 +31,7 @@ def bio(token, bio):
         "token": token,
         "bio": {
             "entry": bio,
-            "timestamp": ""  # Same note on timestamp as above
+            "timestamp": ""  
         }
     })
 

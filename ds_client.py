@@ -1,54 +1,55 @@
 import socket
 import ds_protocol
-import sys
+import time
 
-def send(server: str, port: int, username: str, password: str, message: str, bio: str = None):
-    try:
-        # Establish connection with the server
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-            client.connect((server, port))
-            print(f"Client connected to {server} on port {port}")
-            
-            # Set up file-like communication channels
-            Send = client.makefile('w')
+
+def send(server:str, port:int, username:str, password:str, message:str=None, bio:str=None):
+    """
+    The send function joins a ds server and sends a message, bio, or both
+
+    :param server: The ip address for the ICS 32 DS server.
+    :param port: The port where the ICS 32 DS server is accepting connections.
+    :param username: The user name to be assigned to the message.
+    :param password: The password associated with the username.
+    :param message: The message to be sent to the server.
+    :param bio: Optional, a bio for the user.
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+        client.connect((server, port))
+
+        while True:
+            join_str = f'{{"join": {{"username": "{username}","password": "{password}","token":""}}}}'
+            send = client.makefile('w')
             recv = client.makefile('r')
 
-            # Send join request to the server
-            Join = ds_protocol.join(username, password)
-            Send.write(Join + '\r\n')
-            Send.flush()
+            send.write(join_str + '\r\n')
+            send.flush()
 
-            # Receive and process server response for join request
-            res = recv.readline()
-            srv_msg = ds_protocol.extract_msg(res)  # This should return a namedtuple
-            if srv_msg.type == 'ok':  
-                tkn = srv_msg.token
-                
-                # Initialize a result dictionary
-                results = {'join': 'Success', 'post': None, 'bio': None}
-                
-                # Send post message if provided
-                if message:
-                    POST = ds_protocol.post(tkn, message)
-                    Send.write(POST + '\r\n')
-                    Send.flush()
-                    res = recv.readline()
-                    post_response = ds_protocol.extract_msg(res)  #  expecting a namedtuple
-                    results['post'] = 'Success' if post_response.type == 'ok' else 'Failed'
+            resp = recv.readline()
 
-                # Send bio if provided
-                if bio:
-                    BIO = ds_protocol.bio(tkn, bio)
-                    Send.write(BIO + '\r\n')
-                    Send.flush()
-                    res = recv.readline()
-                    bio_response = ds_protocol.extract_msg(res)  #  again for bio response
-                    results['bio'] = 'Success' if bio_response.type == 'ok' else 'Failed'
-                
-                return results  # Returning the results dictionary
-            else:
-                print(f"Error joining server: {srv_msg.message}")
-                return {'join': 'Failed'}
-    except Exception as e:
-        print(f"ERROR connecting to the server: {e}", sys.exc_info())
-        return {'error': str(e)}
+            decoded_resp = ds_protocol.extract_json(resp)
+
+            if decoded_resp[1] == "error":
+                print(decoded_resp[0])
+                return False
+
+            user_token = decoded_resp[1]
+            curr_time = time.time()
+            if bio:
+                bio_str = f'{{"token": "{user_token}", "bio": {{"entry": "{bio}", "timestamp": "{curr_time}"}}}}'
+                send_bio = client.makefile('w')
+                send_bio.write(bio_str + '\r\n')
+                send_bio.flush()
+                new_recv = client.makefile('r')
+                new_recv = new_recv.readline()
+                print(new_recv)
+
+            if message:
+                post_str = f'{{"token": "{user_token}", "post": {{"entry": "{message}", "timestamp": "{curr_time}"}}}}'
+                send_post = client.makefile('w')
+                send_post.write(post_str + '\r\n')
+                send_post.flush()
+                new_recv = client.makefile('r')
+                new_recv = new_recv.readline()
+                print(new_recv)
+            return True
