@@ -159,45 +159,24 @@ def main():
         if choice == 'c':
             directory = input("Enter the directory where the file should be created: ")
             name = input("What is the name of the new DSU file? ")
-            create_profile(directory, name)
+            ui.create_profile(directory, name)
             current_filename = Path(directory) / f"{name}.dsu"
         elif choice == 'l':
             filename = input("Enter the full path to the DSU file you would like to load: ")
-            current_profile = load_profile(Path(filename))
+            current_profile = ui.load_profile(Path(filename))
             current_filename = Path(filename)
+        elif choice == 'p' and current_profile:
+            ui.publish_post(current_profile)
+        elif choice == 'u' and current_profile:
+            ui.update_bio(current_profile)
+        elif choice == 'v' and current_profile:
+            ui.view_profile_info(current_profile)
         elif choice == 'admin':
-            # Switch to handling commands in admin mode
-            print("Admin mode activated. Type 'q' to quit admin mode.")
-            while True:
-                admin_command = input("> ").strip()
-                if admin_command.lower() == 'q':
-                    break
-                args = admin_command.split()
-                command = args[0].upper()
-
-        if command == 'Q':
+            ui.admin_mode(current_profile)
+        elif choice == 'q':
             break
-        elif command == 'C' and len(args) >= 4 and args[2] == '-n':
-            create_profile(args[1], args[3])
-            current_filename = Path(args[1]) / f"{args[3]}.dsu"  # Remember the new profile's filename
-        elif command == 'L' and len(args) >= 2:
-            options = {args[i]: args[i + 1] for i in range(2, len(args), 2)}
-            list_directory(args[1], options)
-        elif command == 'D' and len(args) == 2:
-            delete_file(Path(args[1]))
-        elif command == 'R' and len(args) == 2:
-            read_file(Path(args[1]))
-        elif command == 'O' and len(args) == 2:  # Open existing profile
-            current_filename = Path(args[1])
-            current_profile = load_profile(current_filename)
-        elif command == 'E' and current_profile and len(args) > 2:  # Edit current profile
-            edit_profile(current_profile, args)
-            # this is to save the profile after editing to keep changes
-            current_profile.save(current_filename)
-        elif command == 'P' and current_profile and len(args) > 1:  # Print profile information
-            print_profile(current_profile, args)
         else:
-            print("Invalid commands/arguments in admin mode. Please try again.")
+            print("Invalid option or no profile loaded. Please choose 'c' to create or 'l' to load a profile.")
 
 if __name__ == "__main__":
     main()
