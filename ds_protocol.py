@@ -1,5 +1,6 @@
 import json
 from collections import namedtuple
+import time
 
 # Definitions for response data structures
 DataTuple = namedtuple('DataTuple', ['type', 'message', 'token'])

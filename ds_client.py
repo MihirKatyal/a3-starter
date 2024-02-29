@@ -1,55 +1,42 @@
 import socket
 import ds_protocol
 import time
-
+import json  # Import json for parsing
 
 def send(server:str, port:int, username:str, password:str, message:str=None, bio:str=None):
-    """
-    The send function joins a ds server and sends a message, bio, or both
-
-    :param server: The ip address for the ICS 32 DS server.
-    :param port: The port where the ICS 32 DS server is accepting connections.
-    :param username: The user name to be assigned to the message.
-    :param password: The password associated with the username.
-    :param message: The message to be sent to the server.
-    :param bio: Optional, a bio for the user.
-    """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
         client.connect((server, port))
+        send = client.makefile('w')
+        recv = client.makefile('r')
 
-        while True:
-            join_str = f'{{"join": {{"username": "{username}","password": "{password}","token":""}}}}'
-            send = client.makefile('w')
-            recv = client.makefile('r')
+        # Join request
+        join_str = ds_protocol.join(username, password)
+        send.write(join_str + '\r\n')
+        send.flush()
 
-            send.write(join_str + '\r\n')
+        resp = recv.readline()
+        decoded_resp = ds_protocol.extract_msg(resp)
+
+        if decoded_resp.type == "error":
+            print(decoded_resp.message)
+            return False
+
+        user_token = decoded_resp.token  # Correctly extracting token from response
+
+        # Sending bio if provided
+        if bio:
+            bio_str = ds_protocol.bio(user_token, bio)
+            send.write(bio_str + '\r\n')
             send.flush()
-
             resp = recv.readline()
+            print(resp)  # Print the server response
 
-            decoded_resp = ds_protocol.extract_json(resp)
+        # Sending message if provided
+        if message:
+            post_str = ds_protocol.post(user_token, message)
+            send.write(post_str + '\r\n')
+            send.flush()
+            resp = recv.readline()
+            print(resp)  # Print the server response
 
-            if decoded_resp[1] == "error":
-                print(decoded_resp[0])
-                return False
-
-            user_token = decoded_resp[1]
-            curr_time = time.time()
-            if bio:
-                bio_str = f'{{"token": "{user_token}", "bio": {{"entry": "{bio}", "timestamp": "{curr_time}"}}}}'
-                send_bio = client.makefile('w')
-                send_bio.write(bio_str + '\r\n')
-                send_bio.flush()
-                new_recv = client.makefile('r')
-                new_recv = new_recv.readline()
-                print(new_recv)
-
-            if message:
-                post_str = f'{{"token": "{user_token}", "post": {{"entry": "{message}", "timestamp": "{curr_time}"}}}}'
-                send_post = client.makefile('w')
-                send_post.write(post_str + '\r\n')
-                send_post.flush()
-                new_recv = client.makefile('r')
-                new_recv = new_recv.readline()
-                print(new_recv)
-            return True
+        return True
