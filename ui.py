@@ -10,6 +10,7 @@ def user_interface():
         print("p - Post a journal entry online")
         print("u - Update bio online")
         print("v - View current profile info")
+        print("admin - Enter Admin mode for advanced commands")
         print("q - Quit")
         choice = input("Your choice (c/l/p/u/v/q): ").strip().lower()
 
@@ -23,6 +24,8 @@ def user_interface():
             update_bio(profile)
         elif choice == 'v' and profile:
             view_profile_info(profile)
+        elif choice == 'admin':
+            admin_mode()
         elif choice == 'q':
             break
         else:
@@ -76,6 +79,9 @@ def view_profile_info(profile):
     print("Posts:")
     for post in profile.get_posts():
         print(f"- {post.entry}")
+
+def admin_mode():
+    print("Welcome to Admin mode! Please choose an option:")
 
 if __name__ == "__main__":
     user_interface()
